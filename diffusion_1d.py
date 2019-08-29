@@ -57,12 +57,10 @@ class Display(Widget):
                             nd.convolve1d(self.diffusion_1d,
                                           self.kernels_1d[self.kernel],
                                           mode='wrap')
-        with self.canvas:
-            self.canvas.remove(self.line)
-            self.line = Line(points=[coor
-                                     for x, y in enumerate(self.diffusion_1d)
-                                     for coor in [x * self.width / array_length,
-                                                  self.height // 2 * (y + 1)]])
+        self.line.points = [coor
+                            for x, y in enumerate(self.diffusion_1d)
+                            for coor in [x * self.width / array_length,
+                                         self.height // 2 * (y + 1)]]
         return True
 
     def poke(self, poke_x, poke_y):
