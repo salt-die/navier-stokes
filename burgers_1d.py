@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*
+"""
+Kivy implementation of 1D burgers.
+
+click to displace line
+'r' to reset
+"""
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.clock import Clock
+from kivy.graphics import Line
+from kivy.core.window import Window
+import numpy as np
+import scipy.ndimage as nd
+
+array_length = 512
+
+class Display(Widget):
+    def __init__(self, **kwargs):
+        super(Display, self).__init__(**kwargs)
+        with self.canvas:
+            self.line = Line()
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        self.burgers_1d = np.zeros(array_length, dtype=np.float32)
+        self.burgers_1d[array_length // 4 : 3 * array_length // 4] = .5
+
+    def _keyboard_closed(self):
+        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        self._keyboard = None
+
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        if keycode[1] == 'r':  #Reset
+            self.burgers_1d = np.zeros(array_length, dtype=np.float32)
+            self.burgers_1d[array_length // 4 : 3 * array_length // 4] = .5
+        return True
+
+    def update(self, dt):
+        self.burgers_1d = -.25 * (self.burgers_1d *\
+                          nd.convolve1d(self.burgers_1d, [1, -1],
+                                        mode='wrap') -\
+                          nd.convolve1d(self.burgers_1d, [1, 2, 1],
+                                        mode='wrap'))
+        #elf.burgers_1d = np.roll(self.burgers_1d, 1)
+
+        with self.canvas:
+            self.canvas.remove(self.line)
+            self.line = Line(points=[coor
+                                     for x, y in enumerate(self.burgers_1d)
+                                     for coor in [x * self.width / array_length,
+                                                  self.height // 2 * (y + 1)]])
+        return True
+
+    def poke(self, poke_x, poke_y):
+        scaled_x = int(poke_x * array_length / self.width)
+        scaled_y = poke_y * 2 / self.height - 1
+        self.burgers_1d[scaled_x - 2:scaled_x + 3] = scaled_y
+        return True
+
+    def on_touch_down(self, touch):
+        self.poke(touch.x, touch.y)
+        return True
+
+    def on_touch_move(self, touch):
+        self.poke(touch.x, touch.y)
+        return True
+
+
+class Burgers_1D(App):
+    def build(self):
+        display = Display()
+        Clock.schedule_interval(display.update, 1.0/120.0)
+        return display
+
+
+if __name__ == '__main__':
+    Burgers_1D().run()
