@@ -11,6 +11,7 @@ from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.core.window import Window
 import numpy as np
+import scipy.ndimage as nd
 
 array_length = 512
 
@@ -36,7 +37,8 @@ class Display(Widget):
 
     def update(self, dt):
         self.convection_1d -= self.convection_1d *\
-                              (self.convection_1d - np.roll(self.convection_1d, 1))
+                              nd.convolve1d(self.convection_1d, [0, 1, -1],
+                                            mode='wrap')
 
         self.line.points = [coor
                             for x, y in enumerate(self.convection_1d)
