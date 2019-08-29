@@ -30,8 +30,8 @@ class Display(Widget):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1] == 'r':  #Reset
-            self.convection_1d = np.zeros(array_length, dtype=np.float32)
-            self.convection_1d[array_length // 4 : 3 * array_length // 4] = .5
+            self.convection_1d = np.full(array_length, .5, dtype=np.float32)
+            self.convection_1d[array_length // 4 : 3 * array_length // 4] = .75
         return True
 
     def update(self, dt):
