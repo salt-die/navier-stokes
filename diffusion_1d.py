@@ -29,8 +29,8 @@ class Display(Widget):
                            np.array([.1, .2, .4, .2, .1])]
         self.kernel = 1
         self.damping = 1.
-        self.diffusion_1d = np.zeros(array_length, dtype=np.float32)
-        self.diffusion_1d[array_length // 4 : 3 * array_length // 4] = .5
+        self.diffusion_1d = np.full(array_length, .5, dtype=np.float32)
+        self.diffusion_1d[array_length // 4 : 3 * array_length // 4] = .75
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
@@ -38,8 +38,8 @@ class Display(Widget):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1] == 'r':  #Reset
-            self.diffusion_1d = np.zeros(array_length, dtype=np.float32)
-            self.diffusion_1d[array_length // 4 : 3 * array_length // 4] = .5
+            self.diffusion_1d = np.full(array_length, .5, dtype=np.float32)
+            self.diffusion_1d[array_length // 4 : 3 * array_length // 4] = .75
             self.damping = 1.
         if keycode[1] == 'left': #Change kernel
             self.kernel = (self.kernel - 1) % len(self.kernels_1d)
@@ -60,12 +60,12 @@ class Display(Widget):
         self.line.points = [coor
                             for x, y in enumerate(self.diffusion_1d)
                             for coor in [x * self.width / array_length,
-                                         self.height // 2 * (y + 1)]]
+                                         self.height * y]]
         return True
 
     def poke(self, poke_x, poke_y):
         scaled_x = int(poke_x * array_length / self.width)
-        scaled_y = poke_y * 2 / self.height - 1
+        scaled_y = poke_y / self.height
         self.diffusion_1d[scaled_x - 2:scaled_x + 3] = scaled_y
         return True
 

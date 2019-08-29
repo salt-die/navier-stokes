@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 """
-Kivy implementation of 1D burgers.
+Kivy implementation of 1D convection.
 
 click to displace line
 'r' to reset
@@ -11,7 +11,6 @@ from kivy.clock import Clock
 from kivy.graphics import Line
 from kivy.core.window import Window
 import numpy as np
-import scipy.ndimage as nd
 
 array_length = 512
 
@@ -22,8 +21,8 @@ class Display(Widget):
             self.line = Line()
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
-        self.burgers_1d = np.full(array_length, .5, dtype=np.float32)
-        self.burgers_1d[array_length // 4 : 3 * array_length // 4] = .75
+        self.convection_1d = np.full(array_length, .5, dtype=np.float32)
+        self.convection_1d[array_length // 4 : 3 * array_length // 4] = .75
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
@@ -31,19 +30,16 @@ class Display(Widget):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1] == 'r':  #Reset
-            self.burgers_1d = np.full(array_length, .5, dtype=np.float32)
-            self.burgers_1d[array_length // 4 : 3 * array_length // 4] = .75
+            self.convection_1d = np.zeros(array_length, dtype=np.float32)
+            self.convection_1d[array_length // 4 : 3 * array_length // 4] = .5
         return True
 
     def update(self, dt):
-        self.burgers_1d = -.25 * (self.burgers_1d *\
-                          nd.convolve1d(self.burgers_1d, [0, 1, -1],
-                                        mode='wrap') -\
-                          nd.convolve1d(self.burgers_1d, [1, 2, 1],
-                                        mode='wrap'))
+        self.convection_1d -= self.convection_1d *\
+                              (self.convection_1d - np.roll(self.convection_1d, 1))
 
         self.line.points = [coor
-                            for x, y in enumerate(self.burgers_1d)
+                            for x, y in enumerate(self.convection_1d)
                             for coor in [x * self.width / array_length,
                                          self.height * y]]
         return True
@@ -51,7 +47,7 @@ class Display(Widget):
     def poke(self, poke_x, poke_y):
         scaled_x = int(poke_x * array_length / self.width)
         scaled_y = poke_y / self.height
-        self.burgers_1d[scaled_x - 2:scaled_x + 3] = scaled_y
+        self.convection_1d[scaled_x - 2:scaled_x + 3] = scaled_y
         return True
 
     def on_touch_down(self, touch):
@@ -63,7 +59,7 @@ class Display(Widget):
         return True
 
 
-class Burgers_1D(App):
+class Convection_1D(App):
     def build(self):
         display = Display()
         Clock.schedule_interval(display.update, 1.0/120.0)
@@ -71,4 +67,4 @@ class Burgers_1D(App):
 
 
 if __name__ == '__main__':
-    Burgers_1D().run()
+    Convection_1D().run()
