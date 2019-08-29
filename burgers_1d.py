@@ -41,7 +41,6 @@ class Display(Widget):
                                         mode='wrap') -\
                           nd.convolve1d(self.burgers_1d, [1, 2, 1],
                                         mode='wrap'))
-        #elf.burgers_1d = np.roll(self.burgers_1d, 1)
 
         with self.canvas:
             self.canvas.remove(self.line)
