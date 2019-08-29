@@ -22,8 +22,8 @@ class Display(Widget):
             self.line = Line()
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
-        self.kernels_1d = [np.array([1, 0, 0]),
-                           np.array([.5, 0, .5]),
+        self.kernels_1d = [np.array([1., 0., 0.]),
+                           np.array([.5, 0., .5]),
                            np.array([1/3, 1/3, 1/3]),
                            np.array([.25, .5, .25]),
                            np.array([.1, .2, .4, .2, .1])]
