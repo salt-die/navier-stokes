@@ -21,15 +21,14 @@ class Display(Widget):
         super(Display, self).__init__(**kwargs)
         self.texture = Texture.create(size=texture_dim)
         with self.canvas:
-            self.rect = Rectangle(texture=self.texture,\
-                                  pos=self.pos,\
+            self.rect = Rectangle(texture=self.texture, pos=self.pos,
                                   size=(self.width, self.height))
         self.bind(size=self._update_rect, pos=self._update_rect)
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
         self.convection_2d = np.zeros(texture_dim, dtype=np.float32).T
         self.convection_2d[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
-                           texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = .5
+                           texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
 
     def _update_rect(self, *args):
         self.rect.size = self.size
@@ -43,7 +42,7 @@ class Display(Widget):
         if keycode[1] == 'r':  #Reset
             self.convection_2d = np.zeros(texture_dim, dtype=np.float32).T
             self.convection_2d[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
-                               texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = .5
+                               texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
         return True
 
     def update(self, dt):
@@ -52,7 +51,9 @@ class Display(Widget):
                               nd.convolve(self.convection_2d, kernel,
                                           mode='wrap')
 
-        self.texture.blit_buffer(np.dstack([self.convection_2d]*3).tobytes(),\
+        self.texture.blit_buffer(np.dstack([np.zeros(texture_dim,
+                                               dtype=np.float32)] * 2 +\
+                                               [self.convection_2d]).tobytes(),
                                  colorfmt='rgb', bufferfmt='float')
         self.canvas.ask_update()
         return True
@@ -61,7 +62,7 @@ class Display(Widget):
         scaled_x = int(poke_x * texture_dim[0] / self.width)
         scaled_y = int(poke_y * texture_dim[1] / self.height)
         self.convection_2d[scaled_y - 5:scaled_y + 6,
-                           scaled_x - 5:scaled_x + 6] = .5
+                           scaled_x - 5:scaled_x + 6] += .1
         return True
 
     def on_touch_down(self, touch):
