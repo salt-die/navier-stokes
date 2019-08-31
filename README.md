@@ -8,4 +8,4 @@ Diffusion in 1D:
 
 Burgers in 1D:
 
-![Burgers in 1D](burgers_1d.gif)
+![Burgers in 1D](burgers_1d_2.gif)
