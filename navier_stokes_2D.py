@@ -17,6 +17,7 @@ import numpy as np
 import scipy.ndimage as nd
 
 texture_dim = [256, 256]
+#drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
                  [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
