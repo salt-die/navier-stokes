@@ -9,3 +9,7 @@ Diffusion in 1D:
 Burgers in 1D:
 
 ![Burgers in 1D](burgers_1d_2.gif)
+
+Navier Stokes in 2D with external flow and random noise:
+
+![Navier Stokes](navier_stokes.gif)
