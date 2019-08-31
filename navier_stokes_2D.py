@@ -27,6 +27,24 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
+con_kernel = np.array([[   0, .25,    0],
+                       [ .25,  -1,  .25],
+                       [   0, .25,    0]])
+dif_kernel = np.array([[.025,  .1, .025],
+                       [  .1,  .5,   .1],
+                       [.025,  .1, .025]])
+poi_kernel = np.array([[   0, .25,    0],
+                       [ .25,   0,  .25],
+                       [   0, .25,    0]])
+#boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
+bc = "wrap"
+viscosity = .0005  #Is it odd that negative viscosity still works?
+rho = 2.05  #Density -- Between -2 and 2 is reasonable
+damping = .994
+external_flow = .4 #flow in the horizontal direction
+flow_kernal = np.array([[0, 0, 0],
+                        [-external_flow, 1, external_flow],
+                        [0, 0, 0]])
 
 class Display(Widget):
     def __init__(self, **kwargs):
@@ -63,34 +81,18 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        con_kernel = np.array([[   0, .25,    0],
-                               [ .25,  -1,  .25],
-                               [   0, .25,    0]])
-        dif_kernel = np.array([[.025,  .1, .025],
-                               [  .1,  .5,   .1],
-                               [.025,  .1, .025]])
-        poi_kernel = np.array([[   0, .25,    0],
-                               [ .25,   0,  .25],
-                               [   0, .25,    0]])
-        #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
-        bc = "wrap"
-        viscosity = .0005  #Is it odd that negative viscosity still works?
-        rho = 2.05  #Density -- Between -2 and 2 is reasonable
-        damping = .994
-        external_flow = .4 #flow in the horizontal direction
-        flow_kernal = np.array([[0, 0, 0],
-                                [-external_flow, 1, external_flow],
-                                [0, 0, 0]])
-
         self.momentum = (viscosity * self.momentum *\
                         nd.convolve(self.momentum, con_kernel, mode=bc) +\
                         nd.convolve(self.momentum, dif_kernel, mode=bc) -\
                         nd.convolve(self.pressure, con_kernel, mode=bc) *\
                         (1 / 2 * rho)) * damping
+
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
+
         #dif for difference, not diffusion -- dif is the change in momentum
         dif = nd.convolve(self.momentum, poi_kernel, mode=bc)
+
         self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) -\
                         rho / 4 * (dif - dif**2)) * damping
 
@@ -102,9 +104,11 @@ class Display(Widget):
         np.clip(self.pressure, -2, 2, out=self.pressure)
         np.clip(self.momentum, -2, 2, out=self.momentum)
 
+        #Wall boundary conditions
         self.momentum = np.where(self.walls!=1, self.momentum, .15)
         self.pressure = np.where(self.walls!=1, self.pressure, 0)
 
+        #Blit
         self.texture.blit_buffer(np.dstack(self.two_thirds_stack +\
                                            [(self.pressure + 1) / 2]).tobytes(),
                                  colorfmt='rgb', bufferfmt='float')
