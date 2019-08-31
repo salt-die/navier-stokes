@@ -14,7 +14,7 @@ from kivy.core.window import Window
 import numpy as np
 import scipy.ndimage as nd
 
-texture_dim = [512, 512]
+texture_dim = [256, 256]
 
 class Display(Widget):
     def __init__(self, **kwargs):
@@ -48,7 +48,7 @@ class Display(Widget):
     def update(self, dt):
         con_kernel = np.array([[0, .25, 0], [.25, -1, .25], [0, .25, 0]])
         dif_kernel = np.array([[.05, .2, .05], [.2, 0, .2], [.05, .2, .05]])
-        con_constant = .49
+        con_constant = .27 #-.3 to .3 is reasonable
         self.burgers_2d = con_constant * self.burgers_2d *\
                           nd.convolve(self.burgers_2d, con_kernel,
                                       mode='wrap') +\
