@@ -39,7 +39,7 @@ poi_kernel = np.array([[   0, .25,    0],
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
 viscosity = .0005  #Is it odd that negative viscosity still works?
-rho = 2.05  #Density -- Between -2 and 2 is reasonable
+rho = 2.05  #Density
 damping = .994
 external_flow = .4 #flow in the horizontal direction
 flow_kernal = np.array([[0, 0, 0],
