@@ -36,11 +36,11 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        self.burgers_1d = -.25 * (self.burgers_1d *\
+        self.burgers_1d = .3 * self.burgers_1d *\
                           nd.convolve1d(self.burgers_1d, [0, 1, -1],
-                                        mode='wrap') -\
-                          nd.convolve1d(self.burgers_1d, [1, 2, 1],
-                                        mode='wrap'))
+                                        mode='wrap') +\
+                          nd.convolve1d(self.burgers_1d, [.25, .5, .25],
+                                        mode='wrap')
 
         self.line.points = [coor
                             for x, y in enumerate(self.burgers_1d)
