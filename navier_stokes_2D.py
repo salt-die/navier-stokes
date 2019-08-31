@@ -17,6 +17,13 @@ import numpy as np
 import scipy.ndimage as nd
 
 texture_dim = [256, 256]
+#boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
+bc = "wrap"
+viscosity = .0005  #Is it odd that negative viscosity still works?
+rho = 2.05  #Density
+damping = .994
+external_flow = .4 #flow in the horizontal direction
+
 #drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
@@ -27,6 +34,7 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
+
 con_kernel = np.array([[   0, .25,    0],
                        [ .25,  -1,  .25],
                        [   0, .25,    0]])
@@ -36,12 +44,6 @@ dif_kernel = np.array([[.025,  .1, .025],
 poi_kernel = np.array([[   0, .25,    0],
                        [ .25,   0,  .25],
                        [   0, .25,    0]])
-#boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
-bc = "wrap"
-viscosity = .0005  #Is it odd that negative viscosity still works?
-rho = 2.05  #Density
-damping = .994
-external_flow = .4 #flow in the horizontal direction
 flow_kernal = np.array([[0, 0, 0],
                         [-external_flow, 1, external_flow],
                         [0, 0, 0]])
