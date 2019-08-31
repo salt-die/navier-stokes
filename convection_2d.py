@@ -61,7 +61,7 @@ class Display(Widget):
         scaled_x = int(poke_x * texture_dim[0] / self.width)
         scaled_y = int(poke_y * texture_dim[1] / self.height)
         self.convection_2d[scaled_y - 5:scaled_y + 6,
-                           scaled_x - 5:scaled_x + 6] += .1
+                           scaled_x - 5:scaled_x + 6] = 1
         return True
 
     def on_touch_down(self, touch):

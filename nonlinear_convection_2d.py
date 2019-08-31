@@ -46,8 +46,8 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        kernel = np.array([[0, -.25, 0], [-.25, 1, -.25], [0, -.25, 0]])
-        self.convection_2d -= self.convection_2d *\
+        kernel = np.array([[0, .25, 0], [.25, -1, .25], [0, .25, 0]])
+        self.convection_2d += self.convection_2d *\
                               nd.convolve(self.convection_2d, kernel,
                                           mode='wrap')
 
@@ -62,7 +62,7 @@ class Display(Widget):
         scaled_x = int(poke_x * texture_dim[0] / self.width)
         scaled_y = int(poke_y * texture_dim[1] / self.height)
         self.convection_2d[scaled_y - 5:scaled_y + 6,
-                           scaled_x - 5:scaled_x + 6] += .1
+                           scaled_x - 5:scaled_x + 6] = 1
         return True
 
     def on_touch_down(self, touch):
@@ -74,7 +74,7 @@ class Display(Widget):
         return True
 
 
-class Convection_2D(App):
+class Nonlinear_Convection_2D(App):
     def build(self):
         display = Display()
         Clock.schedule_interval(display.update, 1.0/120.0)
@@ -82,4 +82,4 @@ class Convection_2D(App):
 
 
 if __name__ == '__main__':
-    Convection_2D().run()
+    Nonlinear_Convection_2D().run()
