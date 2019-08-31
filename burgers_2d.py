@@ -46,9 +46,13 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        con_kernel = np.array([[0, .25, 0], [.25, -1, .25], [0, .25, 0]])
-        dif_kernel = np.array([[.05, .2, .05], [.2, 0, .2], [.05, .2, .05]])
-        con_constant = .27 #-.3 to .3 is reasonable
+        con_kernel = np.array([[   0, .25,    0],
+                               [ .25,  -1,  .25],
+                               [   0, .25,    0]])
+        dif_kernel = np.array([[.025,  .1, .025],
+                               [  .1,  .5,   .1],
+                               [.025,  .1, .025]])
+        con_constant =  .74 #convection constant
         self.burgers_2d = con_constant * self.burgers_2d *\
                           nd.convolve(self.burgers_2d, con_kernel,
                                       mode='wrap') +\
