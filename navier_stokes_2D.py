@@ -30,6 +30,7 @@ class Display(Widget):
         self.pressure = np.zeros(texture_dim, dtype=np.float32).T
         self.pressure[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
                       texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
+        self.two_thirds_stack = [np.zeros(texture_dim, dtype=np.float32)] * 2
 
     def _update_rect(self, *args):
         self.rect.size = self.size
@@ -57,24 +58,38 @@ class Display(Widget):
         poi_kernel = np.array([[   0, .25,    0],
                                [ .25,   0,  .25],
                                [   0, .25,    0]])
+        #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
+        bc = "wrap"
+        viscosity = .001  #Is it odd that negative viscosity still works?
+        rho = 2.2  #Density -- Between -2 and 2 is reasonable
+        damping = .996
+        external_flow = .4 #flow in the horizontal direction
+        flow_kernal = np.array([[0, 0, 0],
+                                [-external_flow, 1, external_flow],
+                                [0, 0, 0]])
 
-        viscosity = .1  #Is it odd that negative viscosity still works?
-        rho = 2
-        self.momentum = viscosity * self.momentum *\
-                        nd.convolve(self.momentum, con_kernel,
-                                    mode='wrap') +\
-                        nd.convolve(self.momentum, dif_kernel,
-                                    mode='wrap') -\
-                        nd.convolve(self.pressure, con_kernel) *\
-                        (1 / 2 * rho)
+        self.momentum = (viscosity * self.momentum *\
+                        nd.convolve(self.momentum, con_kernel, mode=bc) +\
+                        nd.convolve(self.momentum, dif_kernel, mode=bc) -\
+                        nd.convolve(self.pressure, con_kernel, mode=bc) *\
+                        (1 / 2 * rho)) * damping
+        if external_flow:
+            self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
         #dif for difference, not diffusion -- dif is the change in momentum
-        dif = nd.convolve(self.momentum, poi_kernel, mode='wrap')
-        self.pressure = nd.convolve(self.pressure, poi_kernel, mode='wrap') -\
-                        rho / 4 * (dif - dif**2)
+        dif = nd.convolve(self.momentum, poi_kernel, mode=bc)
+        self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) -\
+                        rho / 4 * (dif - dif**2)) * damping
 
-        self.texture.blit_buffer(np.dstack([np.zeros(texture_dim,
-                                            dtype=np.float32)] * 2 +\
-                                           [self.pressure]).tobytes(),
+        #Add some noise for a bit a of realism
+        self.pressure += np.random.normal(scale=.005, size=texture_dim).T
+        self.momentum += np.random.normal(scale=.005, size=texture_dim).T
+
+        #Keep the values from running away
+        np.clip(self.pressure, -2, 2, out=self.pressure)
+        np.clip(self.momentum, -2, 2, out=self.momentum)
+
+        self.texture.blit_buffer(np.dstack(self.two_thirds_stack +\
+                                           [(self.pressure + 1) / 2]).tobytes(),
                                  colorfmt='rgb', bufferfmt='float')
         self.canvas.ask_update()
         return True
@@ -84,6 +99,8 @@ class Display(Widget):
         scaled_y = int(poke_y * texture_dim[1] / self.height)
         self.pressure[scaled_y - 5:scaled_y + 6,
                       scaled_x - 5:scaled_x + 6] = 1
+        self.momentum[scaled_y - 5:scaled_y + 6,
+                      scaled_x - 5:scaled_x + 6] = 0
         return True
 
     def on_touch_down(self, touch):
