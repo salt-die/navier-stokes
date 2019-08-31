@@ -36,8 +36,8 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        self.burgers_1d = .3 * self.burgers_1d *\
-                          nd.convolve1d(self.burgers_1d, [0, 1, -1],
+        self.burgers_1d = .75 * self.burgers_1d *\
+                          nd.convolve1d(self.burgers_1d, [.5, -1, .5],
                                         mode='wrap') +\
                           nd.convolve1d(self.burgers_1d, [.25, .5, .25],
                                         mode='wrap')
