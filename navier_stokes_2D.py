@@ -61,8 +61,8 @@ class Display(Widget):
         #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
         bc = "wrap"
         viscosity = .001  #Is it odd that negative viscosity still works?
-        rho = 2.2  #Density -- Between -2 and 2 is reasonable
-        damping = .996
+        rho = 2.1  #Density -- Between -2 and 2 is reasonable
+        damping = .994
         external_flow = .4 #flow in the horizontal direction
         flow_kernal = np.array([[0, 0, 0],
                                 [-external_flow, 1, external_flow],
