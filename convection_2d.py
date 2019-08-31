@@ -46,9 +46,8 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        kernel = np.array([[0, -.25, 0], [-.25, 1, -.25], [0, -.25, 0]])
-        self.convection_2d -= self.convection_2d *\
-                              nd.convolve(self.convection_2d, kernel,
+        kernel = np.array([[0, .25, 0], [.25, -1, .25], [0, .25, 0]])
+        self.convection_2d += nd.convolve(self.convection_2d, kernel,
                                           mode='wrap')
 
         self.texture.blit_buffer(np.dstack([np.zeros(texture_dim,
