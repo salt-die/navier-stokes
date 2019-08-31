@@ -47,7 +47,7 @@ class Display(Widget):
 
     def update(self, dt):
         kernel = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
-        self.laplace_2d = nd.convolve(self.laplace_2d, kernel, mode='wrap')/4
+        self.laplace_2d = nd.convolve(self.laplace_2d, kernel, mode='wrap') / 4
 
         self.texture.blit_buffer(np.dstack([np.zeros(texture_dim,
                                                dtype=np.float32)] * 2 +\
