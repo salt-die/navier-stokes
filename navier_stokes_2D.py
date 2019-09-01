@@ -19,7 +19,7 @@ import scipy.ndimage as nd
 texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
-viscosity = .008  #Is it odd that negative viscosity still works?
+viscosity = -.08  #Is it odd that negative viscosity still works?
 rho = 1.99  #Density
 damping = .994
 external_flow = .38  #flow in the horizontal direction
