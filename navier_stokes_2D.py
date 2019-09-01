@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*
 """
-Kivy implementation of 1D burgers.
+Kivy implementation of 2D Navier_Stokes.
 
-click to displace line
+click to displace fluid.
 'r' to reset
 """
 import numpy as np
@@ -19,10 +19,10 @@ from kivy.core.window import Window
 texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
-viscosity = .08  #Is it odd that negative viscosity still works?
-rho = 1.99  #Density
+viscosity = .018  #Is it odd that negative viscosity still works?
+rho = 2.12  #Density
 damping = .994
-external_flow = .38  #flow in the horizontal direction
+external_flow = .4  #flow in the horizontal direction
 
 #drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
