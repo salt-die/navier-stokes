@@ -5,6 +5,8 @@ Kivy implementation of 1D burgers.
 click to displace line
 'r' to reset
 """
+import numpy as np
+import scipy.ndimage as nd
 from kivy.config import Config
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 from kivy.app import App
@@ -13,13 +15,11 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.graphics import Rectangle
 from kivy.core.window import Window
-import numpy as np
-import scipy.ndimage as nd
 
 texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
-viscosity = -.08  #Is it odd that negative viscosity still works?
+viscosity = .08  #Is it odd that negative viscosity still works?
 rho = 1.99  #Density
 damping = .994
 external_flow = .38  #flow in the horizontal direction
@@ -36,7 +36,7 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
 
 red = np.zeros(texture_dim, dtype=np.float32)
-green = np.full(texture_dim, .6549,dtype=np.float32)
+green = np.full(texture_dim, .6549, dtype=np.float32)
 
 con_kernel = np.array([[   0, .25,    0],
                        [ .25,  -1,  .25],
@@ -110,8 +110,8 @@ class Display(Widget):
         np.clip(self.momentum, -1, 1, out=self.momentum)
 
         #Wall boundary conditions
-        self.momentum = np.where(self.walls!=1, self.momentum, -.45)
-        self.pressure = np.where(self.walls!=1, self.pressure, 0.1)
+        self.momentum = np.where(self.walls !=1, self.momentum, -.45)
+        self.pressure = np.where(self.walls !=1, self.pressure, 0.1)
 
         #Blit
         RGB = np.dstack([red, green * self.pressure, (self.pressure + 1) * .5])
@@ -127,12 +127,12 @@ class Display(Widget):
         try:
             if touch.button == "left":
                 self.pressure[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop==1] = .5
+                              scaled_x - 4:scaled_x + 5][drop == 1] = .5
                 self.momentum[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop==1] = .1
+                              scaled_x - 4:scaled_x + 5][drop == 1] = .1
             if touch.button == "right":
                 self.walls[scaled_y - 4:scaled_y + 5,
-                           scaled_x - 4:scaled_x + 5][drop==1] = 1
+                           scaled_x - 4:scaled_x + 5][drop == 1] = 1
         except:
             #Too close to border.
             pass
