@@ -19,8 +19,8 @@ import scipy.ndimage as nd
 texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
-viscosity = .0005  #Is it odd that negative viscosity still works?
-rho = 2.15  #Density
+viscosity = .1  #Is it odd that negative viscosity still works?
+rho = 2.141  #Density
 damping = .994
 external_flow = .4 #flow in the horizontal direction
 
@@ -65,6 +65,8 @@ class Display(Widget):
 
     def reset(self):
         self.momentum = np.zeros(texture_dim, dtype=np.float32).T
+        self.momentum[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
+                      texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = .04
         self.pressure = np.zeros(texture_dim, dtype=np.float32).T
         self.pressure[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
                       texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
@@ -84,11 +86,11 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        self.momentum = (viscosity * self.momentum *\
+        self.momentum = (nd.convolve(self.momentum, dif_kernel, mode=bc) -\
+                        viscosity * self.momentum *\
                         nd.convolve(self.momentum, con_kernel, mode=bc) +\
-                        nd.convolve(self.momentum, dif_kernel, mode=bc) -\
                         nd.convolve(self.pressure, con_kernel, mode=bc) *\
-                        -rho / 2) * damping
+                        rho / 2) * damping
 
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
@@ -100,8 +102,8 @@ class Display(Widget):
                         rho / 4 * (dif - dif**2)) * damping
 
         #Add some noise for a bit a of realism
-        self.pressure += np.random.normal(scale=.005, size=texture_dim).T
-        self.momentum += np.random.normal(scale=.005, size=texture_dim).T
+        self.pressure += np.random.normal(scale=.003, size=texture_dim).T
+        self.momentum += np.random.normal(scale=.003, size=texture_dim).T
 
         #Keep the values from running away
         np.clip(self.pressure, -1, 1, out=self.pressure)
@@ -112,9 +114,7 @@ class Display(Widget):
         self.pressure = np.where(self.walls!=1, self.pressure, 0.1)
 
         #Blit
-        RGB = np.dstack([red,
-                         green * self.pressure,
-                         (self.pressure + 1) / 2])
+        RGB = np.dstack([red, green * self.pressure, (self.pressure + 1) * .5])
         RGB[self.walls == 1] = np.array([.717, .176, .07])
         self.texture.blit_buffer(RGB.tobytes(), colorfmt='rgb',
                                  bufferfmt='float')
