@@ -22,7 +22,7 @@ bc = "wrap"
 viscosity = .1  #Is it odd that negative viscosity still works?
 rho = 2.141  #Density
 damping = .994
-external_flow = .4 #flow in the horizontal direction
+external_flow = .4  #flow in the horizontal direction
 
 #drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
