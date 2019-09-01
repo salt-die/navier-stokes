@@ -35,6 +35,9 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
 
+red = np.zeros(texture_dim, dtype=np.float32)
+green = np.full(texture_dim, .6549,dtype=np.float32)
+
 con_kernel = np.array([[   0, .25,    0],
                        [ .25,  -1,  .25],
                        [   0, .25,    0]])
@@ -65,8 +68,6 @@ class Display(Widget):
         self.pressure = np.zeros(texture_dim, dtype=np.float32).T
         self.pressure[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
                       texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
-        self.two_thirds_stack = [np.zeros(texture_dim, dtype=np.float32),
-                                 np.full(texture_dim, .6549,dtype=np.float32)]
         self.walls = np.zeros(texture_dim, dtype=np.float32).T
 
     def _update_rect(self, *args):
@@ -103,16 +104,16 @@ class Display(Widget):
         self.momentum += np.random.normal(scale=.005, size=texture_dim).T
 
         #Keep the values from running away
-        np.clip(self.pressure, -2, 2, out=self.pressure)
-        np.clip(self.momentum, -2, 2, out=self.momentum)
+        np.clip(self.pressure, -1, 1, out=self.pressure)
+        np.clip(self.momentum, -1, 1, out=self.momentum)
 
         #Wall boundary conditions
         self.momentum = np.where(self.walls!=1, self.momentum, .15)
         self.pressure = np.where(self.walls!=1, self.pressure, 0)
 
         #Blit
-        RGB = np.dstack([self.two_thirds_stack[0],
-                         self.two_thirds_stack[1] * self.pressure,
+        RGB = np.dstack([red,
+                         green * self.pressure,
                          (self.pressure + 1) / 2])
         RGB[self.walls == 1] = np.array([.717, .176, .07])
         self.texture.blit_buffer(RGB.tobytes(), colorfmt='rgb',
