@@ -20,9 +20,9 @@ texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
 viscosity = .008  #Is it odd that negative viscosity still works?
-rho = 2.141  #Density
+rho = 1.99  #Density
 damping = .994
-external_flow = .4  #flow in the horizontal direction
+external_flow = .38  #flow in the horizontal direction
 
 #drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
@@ -127,7 +127,7 @@ class Display(Widget):
         try:
             if touch.button == "left":
                 self.pressure[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop==1] = 1
+                              scaled_x - 4:scaled_x + 5][drop==1] = .5
                 self.momentum[scaled_y - 4:scaled_y + 5,
                               scaled_x - 4:scaled_x + 5][drop==1] = .1
             if touch.button == "right":
