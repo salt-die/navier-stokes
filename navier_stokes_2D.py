@@ -20,7 +20,7 @@ texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
 viscosity = .0005  #Is it odd that negative viscosity still works?
-rho = 2.05  #Density
+rho = 2.15  #Density
 damping = .994
 external_flow = .4 #flow in the horizontal direction
 
@@ -88,7 +88,7 @@ class Display(Widget):
                         nd.convolve(self.momentum, con_kernel, mode=bc) +\
                         nd.convolve(self.momentum, dif_kernel, mode=bc) -\
                         nd.convolve(self.pressure, con_kernel, mode=bc) *\
-                        (1 / 2 * rho)) * damping
+                        -rho / 2) * damping
 
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
@@ -96,7 +96,7 @@ class Display(Widget):
         #dif for difference, not diffusion -- dif is the change in momentum
         dif = nd.convolve(self.momentum, poi_kernel, mode=bc)
 
-        self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) -\
+        self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) +\
                         rho / 4 * (dif - dif**2)) * damping
 
         #Add some noise for a bit a of realism
@@ -108,8 +108,8 @@ class Display(Widget):
         np.clip(self.momentum, -1, 1, out=self.momentum)
 
         #Wall boundary conditions
-        self.momentum = np.where(self.walls!=1, self.momentum, .15)
-        self.pressure = np.where(self.walls!=1, self.pressure, 0)
+        self.momentum = np.where(self.walls!=1, self.momentum, -.45)
+        self.pressure = np.where(self.walls!=1, self.pressure, 0.1)
 
         #Blit
         RGB = np.dstack([red,
@@ -129,7 +129,7 @@ class Display(Widget):
                 self.pressure[scaled_y - 4:scaled_y + 5,
                               scaled_x - 4:scaled_x + 5][drop==1] = 1
                 self.momentum[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop==1] = .04
+                              scaled_x - 4:scaled_x + 5][drop==1] = .1
             if touch.button == "right":
                 self.walls[scaled_y - 4:scaled_y + 5,
                            scaled_x - 4:scaled_x + 5][drop==1] = 1
