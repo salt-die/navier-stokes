@@ -66,7 +66,7 @@ class Display(Widget):
         self.pressure[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
                       texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
         self.two_thirds_stack = [np.zeros(texture_dim, dtype=np.float32),
-                                 np.zeros(texture_dim, dtype=np.float32)]
+                                 np.full(texture_dim, .6549,dtype=np.float32)]
         self.walls = np.zeros(texture_dim, dtype=np.float32).T
 
     def _update_rect(self, *args):
@@ -111,9 +111,12 @@ class Display(Widget):
         self.pressure = np.where(self.walls!=1, self.pressure, 0)
 
         #Blit
-        self.texture.blit_buffer(np.dstack(self.two_thirds_stack +\
-                                           [(self.pressure + 1) / 2]).tobytes(),
-                                 colorfmt='rgb', bufferfmt='float')
+        RGB = np.dstack([self.two_thirds_stack[0],
+                         self.two_thirds_stack[1] * self.pressure,
+                         (self.pressure + 1) / 2])
+        RGB[self.walls == 1] = np.array([.717, .176, .07])
+        self.texture.blit_buffer(RGB.tobytes(), colorfmt='rgb',
+                                 bufferfmt='float')
         self.canvas.ask_update()
         return True
 
@@ -129,10 +132,6 @@ class Display(Widget):
             if touch.button == "right":
                 self.walls[scaled_y - 4:scaled_y + 5,
                            scaled_x - 4:scaled_x + 5][drop==1] = 1
-                self.two_thirds_stack[0][scaled_y - 4:scaled_y + 5,
-                                         scaled_x - 4:scaled_x + 5][drop==1] = .1
-                self.two_thirds_stack[1][scaled_y - 4:scaled_y + 5,
-                                         scaled_x - 4:scaled_x + 5][drop==1] = .3
         except:
             #Too close to border.
             pass
