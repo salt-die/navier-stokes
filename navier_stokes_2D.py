@@ -19,7 +19,7 @@ import scipy.ndimage as nd
 texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
-viscosity = .1  #Is it odd that negative viscosity still works?
+viscosity = .008  #Is it odd that negative viscosity still works?
 rho = 2.141  #Density
 damping = .994
 external_flow = .4  #flow in the horizontal direction
@@ -65,11 +65,11 @@ class Display(Widget):
 
     def reset(self):
         self.momentum = np.zeros(texture_dim, dtype=np.float32).T
-        self.momentum[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
-                      texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = .04
+        self.momentum[3 * texture_dim[0] // 8 : 5 * texture_dim[0] // 8,
+                      3 * texture_dim[1] // 8 : 5 * texture_dim[1] // 8] = .04
         self.pressure = np.zeros(texture_dim, dtype=np.float32).T
-        self.pressure[texture_dim[0] // 4 : 3 * texture_dim[0] // 4,
-                      texture_dim[1] // 4 : 3 * texture_dim[1] // 5] = 1
+        self.pressure[3 * texture_dim[0] // 8 : 5 * texture_dim[0] // 8,
+                      3 * texture_dim[1] // 8 : 5 * texture_dim[1] // 8] = 1
         self.walls = np.zeros(texture_dim, dtype=np.float32).T
 
     def _update_rect(self, *args):
