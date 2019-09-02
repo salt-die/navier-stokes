@@ -38,12 +38,15 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
 red = np.zeros(texture_dim, dtype=np.float32)
 green = np.full(texture_dim, .6549, dtype=np.float32)
 
+#convective kernel
 con_kernel = np.array([[   0, .25,    0],
                        [ .25,  -1,  .25],
                        [   0, .25,    0]])
+#diffusion kernel
 dif_kernel = np.array([[.025,  .1, .025],
                        [  .1,  .5,   .1],
                        [.025,  .1, .025]])
+#poisson kernel
 poi_kernel = np.array([[   0, .25,    0],
                        [ .25,   0,  .25],
                        [   0, .25,    0]])
