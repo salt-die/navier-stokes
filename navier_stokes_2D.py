@@ -106,15 +106,16 @@ class Display(Widget):
         self.momentum += np.random.normal(scale=.003, size=texture_dim).T
 
         #Keep the values from running away
-        np.clip(self.pressure, -1, 1, out=self.pressure)
+        np.clip(self.pressure, -2, 2, out=self.pressure)
         np.clip(self.momentum, -1, 1, out=self.momentum)
 
         #Wall boundary conditions
-        self.momentum = np.where(self.walls !=1, self.momentum, -.45)
-        self.pressure = np.where(self.walls !=1, self.pressure, 0.1)
+        self.momentum = np.where(self.walls !=1, self.momentum, -external_flow)
+        self.pressure = np.where(self.walls !=1, self.pressure, 0)
 
         #Blit
-        RGB = np.dstack([red, green * self.pressure, (self.pressure + 1) * .5])
+        RGB = np.dstack([red, green * self.pressure,
+                         (self.pressure + 1) * .5])
         RGB[self.walls == 1] = np.array([.717, .176, .07])
         self.texture.blit_buffer(RGB.tobytes(), colorfmt='rgb',
                                  bufferfmt='float')
@@ -127,9 +128,9 @@ class Display(Widget):
         try:
             if touch.button == "left":
                 self.pressure[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop == 1] = .5
+                              scaled_x - 4:scaled_x + 5][drop == 1] = 1.
                 self.momentum[scaled_y - 4:scaled_y + 5,
-                              scaled_x - 4:scaled_x + 5][drop == 1] = .1
+                              scaled_x - 4:scaled_x + 5][drop == 1] = 0.
             if touch.button == "right":
                 self.walls[scaled_y - 4:scaled_y + 5,
                            scaled_x - 4:scaled_x + 5][drop == 1] = 1
