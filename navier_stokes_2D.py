@@ -2,7 +2,12 @@
 """
 Kivy implementation of 2D Navier_Stokes.
 
-click to displace fluid.
+Note that boundary conditions(bcs) and external flow are 'hacked'.  To properly
+account for bcs one should 'roll' the arrays by hand instead of using scipy's
+convolve.  It's doubtful the accuracy is worth the overall slowdown of the
+updates though.
+
+click to displace fluid
 'r' to reset
 """
 import numpy as np
@@ -22,7 +27,7 @@ bc = "wrap"
 viscosity = .018  #Is it odd that negative viscosity still works?
 rho = 2.12  #Density
 damping = .994
-external_flow = .4  #flow in the horizontal direction
+external_flow = .4  #flow in the horizontal direction -- this is a hack
 
 #drop just makes pokes look a little better
 drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
@@ -35,8 +40,8 @@ drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
                  [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
 
-red = np.zeros(texture_dim, dtype=np.float32)
-green = np.full(texture_dim, .6549, dtype=np.float32)
+red = np.zeros(texture_dim, dtype=np.float32).T
+green = np.full(texture_dim, .6549, dtype=np.float32).T
 
 #convective kernel
 con_kernel = np.array([[   0, .25,    0],
@@ -117,8 +122,7 @@ class Display(Widget):
         self.pressure = np.where(self.walls !=1, self.pressure, 0)
 
         #Blit
-        RGB = np.dstack([red, green * self.pressure,
-                         (self.pressure + 1) * .5])
+        RGB = np.dstack([red, green * self.pressure, (self.pressure + 1) * .5])
         RGB[self.walls == 1] = np.array([.717, .176, .07])
         self.texture.blit_buffer(RGB.tobytes(), colorfmt='rgb',
                                  bufferfmt='float')
