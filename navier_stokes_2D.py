@@ -25,7 +25,7 @@ texture_dim = [256, 256]
 #boundary condition - 'wrap', 'reflect', 'constant', 'nearest', 'mirror'
 bc = "wrap"
 viscosity = .018  #Is it odd that negative viscosity still works?
-rho = 2.12  #Density
+rho = 1.06  #Density
 damping = .994
 external_flow = .4  #flow in the horizontal direction -- this is a hack
 
@@ -97,8 +97,8 @@ class Display(Widget):
         self.momentum = (nd.convolve(self.momentum, dif_kernel, mode=bc) -\
                         viscosity * self.momentum *\
                         nd.convolve(self.momentum, con_kernel, mode=bc) +\
-                        nd.convolve(self.pressure, con_kernel, mode=bc) *\
-                        rho / 2) * damping
+                        nd.convolve(self.pressure, con_kernel, mode=bc) * rho)\
+                        * damping
 
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
@@ -107,7 +107,7 @@ class Display(Widget):
         dif = nd.convolve(self.momentum, poi_kernel, mode=bc)
 
         self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) +\
-                        rho / 4 * (dif - dif**2)) * damping
+                        rho / 2 * (dif - dif**2)) * damping
 
         #Add some noise for a bit a of realism
         self.pressure += np.random.normal(scale=.003, size=texture_dim).T
