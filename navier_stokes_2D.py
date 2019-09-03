@@ -109,14 +109,6 @@ class Display(Widget):
         self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) +\
                         rho / 2 * (dif - dif**2)) * damping
 
-        #Add some noise for a bit a of realism
-        self.pressure += np.random.normal(scale=.003, size=texture_dim).T
-        self.momentum += np.random.normal(scale=.003, size=texture_dim).T
-
-        #Keep the values from running away
-        np.clip(self.pressure, -2, 2, out=self.pressure)
-        np.clip(self.momentum, -1, 1, out=self.momentum)
-
         #Wall boundary conditions
         self.momentum = np.where(self.walls !=1, self.momentum, -external_flow)
         self.pressure = np.where(self.walls !=1, self.pressure, 0)
