@@ -1,5 +1,7 @@
 This incremental project intends to implement a discrete 2D Navier-Stokes model
-in Kivy starting from 1D diffusion and working our way up.
+in Kivy starting from 1D diffusion and working our way up. This is largely
+following the steps outlined in [12 Steps to Navier Stokes](https://lorenabarba.com/blog/cfd-python-12-steps-to-navier-stokes/),
+but with some simpler implementation due to convolutions.
 
 Diffusion in 1D:
 
