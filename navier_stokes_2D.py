@@ -26,7 +26,7 @@ texture_dim = [256, 256]
 bc = "wrap"
 viscosity = .018  #Is it odd that negative viscosity still works?
 rho = 1.06  #Density
-damping = .994
+damping = .994  #Breaks conservation, but behavior is more river-like
 external_flow = .4  #flow in the horizontal direction -- this is a hack
 
 #drop just makes pokes look a little better
