@@ -30,14 +30,14 @@ damping = .994  #Breaks conservation, but behavior is more river-like
 external_flow = .4  #flow in the horizontal direction -- this is a hack
 
 #drop just makes pokes look a little better
-drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],\
-                 [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
-                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
-                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
-                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
-                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
-                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],\
-                 [0., 1., 1., 1., 1., 1., 1., 1., 0.],\
+drop = np.array([[0., 0., 1., 1., 1., 1., 1., 0., 0.],
+                 [0., 1., 1., 1., 1., 1., 1., 1., 0.],
+                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                 [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+                 [0., 1., 1., 1., 1., 1., 1., 1., 0.],
                  [0., 0., 1., 1., 1., 1., 1., 0., 0.],])
 
 red = np.zeros(texture_dim, dtype=np.float32).T
@@ -94,11 +94,11 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        self.momentum = (nd.convolve(self.momentum, dif_kernel, mode=bc) -\
-                        viscosity * self.momentum *\
-                        nd.convolve(self.momentum, con_kernel, mode=bc) +\
-                        nd.convolve(self.pressure, con_kernel, mode=bc) * rho)\
-                        * damping
+        self.momentum = ((nd.convolve(self.momentum, dif_kernel, mode=bc) -
+                        viscosity * self.momentum *
+                        nd.convolve(self.momentum, con_kernel, mode=bc) +
+                        nd.convolve(self.pressure, con_kernel, mode=bc) * rho)
+                        * damping)
 
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
@@ -106,8 +106,8 @@ class Display(Widget):
         #dif for difference, not diffusion -- dif is the change in momentum
         dif = nd.convolve(self.momentum, poi_kernel, mode=bc)
 
-        self.pressure = (nd.convolve(self.pressure, poi_kernel, mode=bc) +\
-                        rho / 2 * (dif - dif**2)) * damping
+        self.pressure = ((nd.convolve(self.pressure, poi_kernel, mode=bc) +
+                        rho / 2 * (dif - dif**2)) * damping)
 
         #Wall boundary conditions
         self.momentum = np.where(self.walls !=1, self.momentum, -external_flow)
