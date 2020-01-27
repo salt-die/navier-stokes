@@ -94,11 +94,11 @@ class Display(Widget):
         return True
 
     def update(self, dt):
-        self.momentum = ((nd.convolve(self.momentum, dif_kernel, mode=bc) -
-                        viscosity * self.momentum *
-                        nd.convolve(self.momentum, con_kernel, mode=bc) +
-                        nd.convolve(self.pressure, con_kernel, mode=bc) * rho)
-                        * damping)
+        self.momentum = (  nd.convolve(self.momentum, dif_kernel, mode=bc)
+                         - (  viscosity * self.momentum
+                            * nd.convolve(self.momentum, con_kernel, mode=bc))
+                         + nd.convolve(self.pressure, con_kernel, mode=bc) * rho)
+        self.momentum *= damping
 
         if external_flow:
             self.momentum = nd.convolve(self.momentum, flow_kernal, mode=bc)
